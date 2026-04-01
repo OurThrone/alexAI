@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Volume I — Nicholas Shadowrider</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #03020a;
+      --deep: #0a0714;
+      --midnight: #100d1f;
+      --dusk: #1a1530;
+      --shadow-purple: #2d1f5e;
+      --mist: #6b5fa8;
+      --starlight: #b8a9e8;
+      --moon: #e8e0ff;
+      --gold: #c9a84c;
+      --ember: #e07040;
+      --rose-dark: #8b1a3a;
+      --rose: #c94070;
+      --parchment: #f0e8d8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--void);
+      color: var(--moon);
+      font-family: 'EB Garamond', Georgia, serif;
+      overflow-x: hidden;
+    }
+
+    #stars-canvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(3,2,10,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(184,169,232,0.1);
+    }
+
+    .nav-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      color: var(--starlight);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--starlight);
+      text-decoration: none;
+      text-transform: uppercase;
+      opacity: 0.6;
+      transition: opacity 0.3s, color 0.3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    /* === VOLUME HERO === */
+    .vol-hero {
+      position: relative;
+      z-index: 2;
+      min-height: 60vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 2rem 5rem;
+      text-align: center;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(45,31,94,0.5) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(139,26,58,0.1) 0%, transparent 60%);
+    }
+
+    .vol-num {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(6rem, 15vw, 12rem);
+      line-height: 0.85;
+      color: rgba(184,169,232,0.05);
+      position: absolute;
+      top: 8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .vol-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .vol-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.8rem, 5vw, 4rem);
+      color: var(--moon);
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 0 20px rgba(184,169,232,0.3));
+    }
+
+    .vol-tagline {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--mist);
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.7;
+    }
+
+    .vol-meta {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .vol-meta-item {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184,169,232,0.4);
+      border: 1px solid rgba(184,169,232,0.1);
+      padding: 0.4rem 1rem;
+    }
+
+    /* === LAYOUT === */
+    .reading-layout {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 0;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .reading-layout { grid-template-columns: 1fr; }
+      .toc-sidebar { display: none; }
+    }
+
+    /* === TABLE OF CONTENTS SIDEBAR === */
+    .toc-sidebar {
+      position: sticky;
+      top: 5rem;
+      padding: 2rem 1.5rem 2rem 2rem;
+      border-right: 1px solid rgba(184,169,232,0.08);
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(184,169,232,0.2) transparent;
+    }
+
+    .toc-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    .toc-list { list-style: none; }
+
+    .toc-item {
+      margin-bottom: 0.1rem;
+    }
+
+    .toc-link {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: rgba(184,169,232,0.45);
+      text-decoration: none;
+      padding: 0.4rem 0.6rem;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+      line-height: 1.4;
+    }
+
+    .toc-link:hover {
+      color: var(--starlight);
+      border-left-color: rgba(184,169,232,0.3);
+    }
+
+    .toc-link.active {
+      color: var(--gold);
+      border-left-color: var(--gold);
+      background: rgba(201,168,76,0.05);
+    }
+
+    /* === READING CONTENT === */
+    .reading-content {
+      padding: 3rem 3rem 8rem 4rem;
+    }
+
+    @media (max-width: 900px) {
+      .reading-content { padding: 2rem 1.5rem 6rem; }
+    }
+
+    /* Foreword / intro section */
+    .foreword-section {
+      max-width: 680px;
+      margin-bottom: 5rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid rgba(184,169,232,0.08);
+    }
+
+    .foreword-section h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2rem;
+    }
+
+    .foreword-section p {
+      font-size: 1.05rem;
+      line-height: 2;
+      color: rgba(232,224,255,0.8);
+      margin-bottom: 1.5rem;
+    }
+
+    /* === CHAPTER BLOCK === */
+    .chapter {
+      max-width: 680px;
+      margin-bottom: 5rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid rgba(184,169,232,0.06);
+      scroll-margin-top: 6rem;
+    }
+
+    .chapter:last-child { border-bottom: none; }
+
+    .chapter-header {
+      margin-bottom: 3rem;
+    }
+
+    .chapter-roman {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 3rem;
+      color: rgba(184,169,232,0.07);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .chapter-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .chapter-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--moon);
+      margin-bottom: 1.2rem;
+    }
+
+    .chapter-epigraph {
+      padding: 1rem 1.5rem;
+      border-left: 2px solid rgba(201,168,76,0.3);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: rgba(184,169,232,0.5);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .chapter-epigraph cite {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      font-style: normal;
+      color: rgba(184,169,232,0.35);
+    }
+
+    /* Prose */
+    .prose p {
+      font-size: 1.1rem;
+      line-height: 2.05;
+      color: rgba(240,232,216,0.88);
+      margin-bottom: 1.5rem;
+      text-indent: 1.5em;
+    }
+
+    .prose p:first-child { text-indent: 0; }
+
+    .scene-break {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin: 2.5rem 0;
+      color: rgba(184,169,232,0.3);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+    }
+
+    .scene-break::before,
+    .scene-break::after {
+      content: '';
+      display: block;
+      height: 1px;
+      width: 40px;
+      background: rgba(184,169,232,0.2);
+    }
+
+    /* === DIALOGUE BUBBLES === */
+    .dialogue-block {
+      margin: 1.8rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .dialogue-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .dialogue-line.right {
+      flex-direction: row-reverse;
+    }
+
+    .dialogue-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-top: 0.2rem;
+    }
+
+    .dialogue-content { max-width: calc(100% - 50px); }
+
+    .dialogue-speaker {
+      font-family: 'Cinzel', serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .dialogue-line.right .dialogue-speaker { text-align: right; }
+
+    .dialogue-bubble {
+      display: inline-block;
+      padding: 0.75rem 1.1rem;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--moon);
+      position: relative;
+    }
+
+    /* Left bubble */
+    .dialogue-line:not(.right) .dialogue-bubble {
+      background: rgba(45,31,94,0.25);
+      border: 1px solid rgba(184,169,232,0.12);
+      border-radius: 0 10px 10px 10px;
+    }
+
+    /* Right bubble */
+    .dialogue-line.right .dialogue-bubble {
+      background: rgba(139,26,58,0.15);
+      border: 1px solid rgba(201,64,112,0.15);
+      border-radius: 10px 0 10px 10px;
+    }
+
+    /* Special speaker colors */
+    .spk-prolith .dialogue-bubble {
+      background: rgba(20,18,60,0.4);
+      border-color: rgba(100,80,200,0.2);
+    }
+
+    .spk-prolith .dialogue-speaker { color: #8080d8; }
+
+    .spk-bunbun .dialogue-bubble {
+      background: rgba(60,40,15,0.4);
+      border-color: rgba(201,168,76,0.2);
+    }
+
+    .spk-bunbun .dialogue-speaker { color: var(--gold); }
+
+    .spk-nicholas .dialogue-speaker { color: var(--starlight); }
+    .spk-nicholas .dialogue-avatar { background: #3a2070; }
+
+    .spk-valyren .dialogue-speaker { color: #d06060; }
+    .spk-valyren .dialogue-avatar { background: #5a1020; }
+
+    .spk-alexa .dialogue-speaker { color: #a8a0d0; }
+    .spk-alexa .dialogue-avatar { background: #202040; }
+
+    .spk-rominae .dialogue-speaker { color: #c080c0; }
+    .spk-rominae .dialogue-avatar { background: #3a1040; }
+
+    .spk-laura .dialogue-speaker { color: #60c080; }
+    .spk-laura .dialogue-avatar { background: #1a4020; }
+
+    .spk-dianne .dialogue-speaker { color: #e09060; }
+    .spk-dianne .dialogue-avatar { background: #3a2010; }
+
+    .spk-adelaide .dialogue-speaker { color: #80d0c0; }
+    .spk-adelaide .dialogue-avatar { background: #103030; }
+
+    .spk-alea .dialogue-speaker { color: #80b080; }
+    .spk-alea .dialogue-avatar { background: #102010; }
+
+    .spk-july .dialogue-speaker { color: #80d060; }
+    .spk-july .dialogue-avatar { background: #1a3010; }
+
+    .spk-corvin .dialogue-speaker { color: #808090; }
+    .spk-corvin .dialogue-avatar { background: #202030; }
+
+    .spk-ksu .dialogue-speaker { color: #8080e0; }
+    .spk-ksu .dialogue-avatar { background: #101050; }
+
+    /* narrator aside */
+    .narrator-aside {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: rgba(184,169,232,0.4);
+      text-align: center;
+      margin: 0.25rem 0;
+    }
+
+    /* === CHAPTER NAV === */
+    .chapter-nav {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid rgba(184,169,232,0.08);
+      justify-content: space-between;
+    }
+
+    .chapter-nav-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184,169,232,0.5);
+      text-decoration: none;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid rgba(184,169,232,0.15);
+      transition: all 0.3s;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .chapter-nav-btn:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    /* Volume navigation bar */
+    .volume-nav {
+      position: relative;
+      z-index: 2;
+      background: rgba(10,7,20,0.9);
+      border-bottom: 1px solid rgba(184,169,232,0.08);
+      padding: 0.75rem 3rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .volume-nav::-webkit-scrollbar { display: none; }
+
+    .vol-nav-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid rgba(184,169,232,0.12);
+      color: rgba(184,169,232,0.4);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .vol-nav-btn:hover, .vol-nav-btn.active {
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.3);
+    }
+
+    /* Ornament */
+    .ornament {
+      display: block;
+      text-align: center;
+      margin: 1rem auto;
+      opacity: 0.45;
+    }
+
+    footer {
+      position: relative; z-index: 2;
+      background: var(--void);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(184,169,232,0.08);
+    }
+    .footer-title { font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; color: var(--starlight); margin-bottom: 0.5rem; }
+    .footer-links { display: flex; gap: 2rem; justify-content: center; list-style: none; margin: 1.5rem 0; }
+    .footer-links a { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(184,169,232,0.5); text-decoration: none; transition: color 0.3s; }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: 0.8rem; color: rgba(184,169,232,0.25); }
+
+    /* Reading progress bar */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--shadow-purple), var(--rose));
+      z-index: 200;
+      transition: width 0.1s;
+      width: 0%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<canvas id="stars-canvas"></canvas>
+
+<nav>
+  <a href="index.html" class="nav-logo">Nicholas Shadowrider</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="volumes.html">Volumes</a></li>
+    <li><a href="characters.html">Characters</a></li>
+    <li><a href="world.html">The World</a></li>
+  </ul>
+</nav>
+
+<!-- Volume selector bar -->
+<div class="volume-nav" style="padding-top: 4.5rem;">
+  <a href="vol1.html" class="vol-nav-btn active">Vol I</a>
+  <a href="vol2.html" class="vol-nav-btn">Vol II</a>
+  <a href="vol3.html" class="vol-nav-btn">Vol III</a>
+  <a href="vol4.html" class="vol-nav-btn">Vol IV</a>
+  <a href="vol5.html" class="vol-nav-btn">Vol V</a>
+  <a href="vol6.html" class="vol-nav-btn">Vol VI</a>
+  <a href="vol7.html" class="vol-nav-btn">Vol VII</a>
+  <a href="vol8.html" class="vol-nav-btn">Vol VIII</a>
+  <a href="vol9.html" class="vol-nav-btn">Vol IX</a>
+  <a href="vol10.html" class="vol-nav-btn">Vol X</a>
+  <a href="vol11.html" class="vol-nav-btn">Vol XI</a>
+  <a href="vol12.html" class="vol-nav-btn">Vol XII</a>
+</div>
+
+<!-- Volume Hero -->
+<div class="vol-hero">
+  <div class="vol-num">I</div>
+  <p class="vol-label">Volume One</p>
+  <h1 class="vol-title">The Outcast of Ashenveil</h1>
+  <p class="vol-tagline">Where shadow breathes and storm winds cry,<br>where outcast hands may touch the sky.</p>
+  <div class="vol-meta">
+    <span class="vol-meta-item">19 Chapters</span>
+    <span class="vol-meta-item">Dark Epic Fantasy</span>
+    <span class="vol-meta-item">Age 15+</span>
+    <span class="vol-meta-item">First Edition</span>
+  </div>
+</div>
+
+<!-- Reading Layout -->
+<div class="reading-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="toc-sidebar">
+    <p class="toc-title">Table of Contents</p>
+    <ul class="toc-list">
+      <li class="toc-item"><a href="#foreword" class="toc-link">Foreword</a></li>
+      <li class="toc-item"><a href="#prologue" class="toc-link">Prologue — A Watching from the Void</a></li>
+      <li class="toc-item"><a href="#ch1" class="toc-link">I — The Boy the Village Forgot</a></li>
+      <li class="toc-item"><a href="#ch2" class="toc-link">II — Smoke at the Edge of Thornwood</a></li>
+      <li class="toc-item"><a href="#ch3" class="toc-link">III — The Forcefield Event</a></li>
+      <li class="toc-item"><a href="#ch4" class="toc-link">IV — Powers That Should Not Exist</a></li>
+      <li class="toc-item"><a href="#ch5" class="toc-link">V — BunBun and the Shadow Compass</a></li>
+      <li class="toc-item"><a href="#ch6" class="toc-link">VI — Alexa</a></li>
+      <li class="toc-item"><a href="#ch7" class="toc-link">VII — Prolith</a></li>
+      <li class="toc-item"><a href="#ch8" class="toc-link">VIII — Companions Gathering</a></li>
+      <li class="toc-item"><a href="#ch9" class="toc-link">IX — Laura and the Sound of War</a></li>
+      <li class="toc-item"><a href="#ch10" class="toc-link">X — The Mirror Arc</a></li>
+      <li class="toc-item"><a href="#ch11" class="toc-link">XI — Into the Deepreach</a></li>
+      <li class="toc-item"><a href="#ch12" class="toc-link">XII — The Ancient Pond Cocoon</a></li>
+      <li class="toc-item"><a href="#ch13" class="toc-link">XIII — The Fear Trial</a></li>
+      <li class="toc-item"><a href="#ch14" class="toc-link">XIV — The Earth Tower</a></li>
+      <li class="toc-item"><a href="#ch15" class="toc-link">XV — The Tower Awakens</a></li>
+      <li class="toc-item"><a href="#ch16" class="toc-link">XVI — Rohmana Speaks</a></li>
+      <li class="toc-item"><a href="#ch17" class="toc-link">XVII — The Road Back</a></li>
+      <li class="toc-item"><a href="#ch18" class="toc-link">XVIII — Burning Roses</a></li>
+      <li class="toc-item"><a href="#ch19" class="toc-link">XIX — What Valyren Said</a></li>
+      <li class="toc-item"><a href="#epilogue" class="toc-link">Epilogue — The Void Stirs</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main content -->
+  <main class="reading-content">
+
+    <!-- Foreword -->
+    <section class="foreword-section" id="foreword">
+      <h2>Foreword · The World of Ashenveil</h2>
+      <div class="prose">
+        <p>Before you enter this story, you must understand the land that holds it. Ashenveil is not a great city. It is not a fortress or a seat of power. It is a village — old, stubborn, and quietly afraid. It sits at the meeting point of three forests: the Thornwood to the east, a dense and briar-choked woodland where hunters go and sometimes do not return; the Greymantle to the north, a pale and foggy expanse whose trees grow white and whose birds never sing; and the Deepreach to the west, the oldest forest in all the known lands, older than the kingdoms, older than written memory, so dark and so vast that even the most seasoned rangers mark its edges on their maps and write simply: <em>Here ends the known world.</em></p>
+        <p>Ashenveil has one great protection: the ward. A shimmering forcefield of elemental energy, woven over generations by five anchors — five people of power bound to the village by blood and oath. The five elements required are earth, water, air, fire, and shadow. For years, the ward held firm. But the fifth anchor — the shadow anchor — has been missing for decades. The forcefield has been incomplete. And something in the Deepreach has noticed the gap.</p>
+        <p>Magic in this world is elemental and personal. Every individual with power has a unique relationship with their element — it is not simply a tool but an extension of identity. Shadow magic is the rarest and most feared. Air magic is free and wild. Earth is patient. Water heals and drowns in equal measure. Fire remembers everything it burns. And above all of these, there is the Void — and those who have touched it are never quite the same again.</p>
+        <p>This is the world into which Nicholas Shadowrider was born. An outcast, a boy with two elements in a village that fears one of them, carrying a pact he did not ask for and a destiny he does not yet know is his.</p>
+      </div>
+    </section>
+
+    <svg class="ornament" width="200" height="20" viewBox="0 0 200 20">
+      <line x1="0" y1="10" x2="80" y2="10" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
+      <polygon points="90,2 100,10 90,18 80,10" stroke="#c9a84c" fill="none" stroke-width="0.5"/>
+      <circle cx="100" cy="10" r="2" fill="#c9a84c" opacity="0.7"/>
+      <polygon points="110,2 120,10 110,18 120,10" stroke="#c9a84c" fill="none" stroke-width="0.5"/>
+      <line x1="120" y1="10" x2="200" y2="10" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
+    </svg>
+
+    <!-- PROLOGUE -->
+    <section class="chapter" id="prologue">
+      <div class="chapter-header">
+        <div class="chapter-roman">✦</div>
+        <div class="chapter-label">Prologue</div>
+        <h2 class="chapter-title">A Watching from the Void</h2>
+        <blockquote class="chapter-epigraph">
+          Between the worlds there is a place with no name, no light, no sound. He has lived there long enough that he no longer misses those things.
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>There was a space between the worlds. It had no name because no language belonging to the living had ever needed to describe it. It existed in the negative — the gap between one reality and the next, the pause between heartbeats, the silence after thunder stops but before the next bolt decides to fall. It was made of the absence of things. And in that absence, something was building.</p>
+        <p>Dimitreus stood — if standing was the right word for what he did in a place without ground — at the centre of nothing, and he watched. Watching was what he did now. It was patience, and patience was power, and he had learned the shape of power from the inside out by losing it completely and spending two decades clawing it back piece by piece from the bones of the void.</p>
+        <p>The ward was failing. He could see it the way you could see a candle through a dirty window — the light dimmer than it should be, guttering, the flame bending in a draft that should not be there. The forcefield around Ashenveil had held for sixty years on the strength of four anchors. Four was not enough. Four was never enough.</p>
+        <p>He turned his attention toward a specific house on a specific lane. Toward a boy who walked with his head down and his shadow slightly wrong. The shadow moved a half-second after the boy did. Most people did not notice that. Dimitreus noticed. Dimitreus looked at everything.</p>
+        <p>The boy was the fifth anchor. Shadow and air. A warlock pact sealed in the generation before. The boy would either become the thing that saved Ashenveil or the thing that destroyed it. Dimitreus found both outcomes acceptable. He settled deeper into the nothing and continued to watch.</p>
+        <div class="scene-break">· · ·</div>
+        <p>In the village of Ashenveil, a boy named Nicholas was walking to the well. He did not know he was being watched. He did not know what was coming. He did not know what he was. Not yet.</p>
+      </div>
+    </section>
+
+    <!-- CHAPTER I -->
+    <section class="chapter" id="ch1">
+      <div class="chapter-header">
+        <div class="chapter-roman">I</div>
+        <div class="chapter-label">Chapter One</div>
+        <h2 class="chapter-title">The Boy the Village Forgot</h2>
+        <blockquote class="chapter-epigraph">
+          An outcast is not someone who was rejected. An outcast is someone who was seen clearly — and the ones who saw them were afraid.
+          <cite>— From the Codex of Ashenveil, Third Reckoning</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>Nicholas Shadowrider was seventeen years old and had learned to walk as if he was not quite there. It was a skill that took years to perfect. The trick was in the shoulders — keep them slightly curved, never squared, never claiming space. The eyes stayed down or mid-distance, never meeting. The footfalls were light, deliberate, the pace of someone moving through a room full of sleeping animals. He had started learning it at nine when the first stone was thrown. He had completed it by twelve when the stones stopped and the silence replaced them, which was worse.</p>
+        <p>Silence was organised. Silence was a decision. A stone thrown in anger was personal — a flash of fear given kinetic shape. But silence was the whole village deciding, collectively and quietly, that Nicholas Shadowrider would not be addressed unless absolutely necessary, and that the gap he walked through when he moved between buildings was not truly a gap but rather a space that belonged to something they preferred not to name.</p>
+        <p>He understood it. That was the worst part. His shadow was wrong. It fell slightly behind him. It moved in the same direction he moved but with a delay — sometimes half a second, sometimes a full second, long enough that if you watched carefully you would notice it and then feel, at the base of your spine, something cold and quiet that your body identified as danger before your mind had caught up.</p>
+        <div class="scene-break">· · ·</div>
+        <p>The well was in the centre square. He came through the narrow lane and found the square occupied. Seven people. Elder Corvin standing near the well as if he had been positioned there. Herath the blacksmith. His wife, Dorn. The Cavins family. Nicholas kept walking. He reached the well. He set his bucket down. He began to lower the rope. Elder Corvin said nothing. The silence was so complete that Nicholas could hear the rope paying out against the old wooden winch.</p>
+        <p>It was Tessa who made the mistake of looking at his shadow. He heard the small, involuntary sound she made — not quite a word, more like the beginning of one that she stopped.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-corvin">
+          <div class="dialogue-avatar">🧓</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Elder Corvin</div>
+            <div class="dialogue-bubble">"The mist was closer last night."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— not to Nicholas, but to the air</p>
+        <div class="dialogue-line spk-corvin">
+          <div class="dialogue-avatar">🧓</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Herath the Blacksmith</div>
+            <div class="dialogue-bubble">"Three fingers of ground past the first marker stones. Checked it myself at dawn."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-corvin">
+          <div class="dialogue-avatar">👤</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Dorn</div>
+            <div class="dialogue-bubble">"The ward should hold."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-corvin">
+          <div class="dialogue-avatar">🧓</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Elder Corvin</div>
+            <div class="dialogue-bubble">"The ward held better when there were five anchors."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— this time with a direction to it. A slight inclination toward Nicholas that was not quite looking at him and not quite not.</p>
+      </div>
+
+      <div class="prose">
+        <p>Nicholas filled his bucket. He coiled the well rope back on its hook with the same care he always used. He picked up his bucket. He walked away. He did not let his hands shake until he was back in the lane, and then only slightly, and only for a moment.</p>
+        <div class="scene-break">· · ·</div>
+        <p>The house Nicholas shared with his mother was on the far western lane — the lane closest to the Deepreach. Alea was at the long table, working through a set of dried root bundles with a bone-handled knife and a methodical patience that she applied to all physical tasks.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"The mist was closer."</div>
+          </div>
+        </div>
+        <div class="dialogue-line right spk-alea">
+          <div class="dialogue-avatar">🌿</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Alea</div>
+            <div class="dialogue-bubble">"I felt it. Since before dawn."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Elder Corvin was at the well."</div>
+          </div>
+        </div>
+        <div class="dialogue-line right spk-alea">
+          <div class="dialogue-avatar">🌿</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Alea</div>
+            <div class="dialogue-bubble">"Yes."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"He said the ward held better with five anchors."</div>
+          </div>
+        </div>
+        <div class="dialogue-line right spk-alea">
+          <div class="dialogue-avatar">🌿</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Alea</div>
+            <div class="dialogue-bubble">"He says that often."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"In my direction."</div>
+          </div>
+        </div>
+        <div class="dialogue-line right spk-alea">
+          <div class="dialogue-avatar">🌿</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Alea</div>
+            <div class="dialogue-bubble">"Nicholas. You were the fifth anchor before you were born. The pact was sealed. You were always going to carry that. I cannot fix what the village makes of it."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"You could tell them."</div>
+          </div>
+        </div>
+        <div class="dialogue-line right spk-alea">
+          <div class="dialogue-avatar">🌿</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Alea</div>
+            <div class="dialogue-bubble">"I have told them. Your grandmother has told them. Your grandfather has told them twice in formal council. People hear what they are ready to hear."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Nicholas stood at the window and looked west at the dark mass of the Deepreach on the horizon. The mist — thin, grey-blue, low to the ground — crept another inch forward across the scrubland while he watched.</p>
+      </div>
+    </section>
+
+    <!-- CHAPTER II - abridged with key scenes -->
+    <section class="chapter" id="ch2">
+      <div class="chapter-header">
+        <div class="chapter-roman">II</div>
+        <div class="chapter-label">Chapter Two</div>
+        <h2 class="chapter-title">Smoke at the Edge of Thornwood</h2>
+        <blockquote class="chapter-epigraph">
+          The Deepreach does not attack. It simply remembers — and when the things inside it stir, it is because they have remembered something they wish had stayed forgotten.
+          <cite>— Ranger Dispatch, Northern Ashenveil Reach, Year 847</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>The mist came to the marker stones three days later. Not because it had been repelled — the mist had gathered the information it came for. It knew the gap. It knew the shape of the missing anchor. It would come back with that knowledge.</p>
+        <p>On the eighth day, he went to BunBun. The shop was on the eastern edge of Ashenveil, past the pump-house, on a lane that most people avoided without being able to articulate exactly why. The interior smelled of old wood, metal oil, and something floral that changed slightly on every visit. BunBun was behind the counter. BunBun was always behind the counter.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"Nicholas."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I need something."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"You always need something. Sit down."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"The mist is testing the ward. My family is exhausted holding four points that are supposed to be five. I want to do something about it."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"Do you know what you are?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I am the fifth anchor. I am a warlock — or the beginning of one. I have shadow and air in me. I have a pact I did not sign but that is mine anyway."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"That is the technical answer. Do you know what you are?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"No."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"Good. That is the right answer. People who know what they are have stopped looking. You are still looking. That is important."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>BunBun reached beneath the counter and produced something small — about the size of a closed fist, made of dark metal with a surface like old water. Shaped like a compass with eight points instead of the usual four, and in place of the magnetic needle, a thin shadow-line that moved, slowly, on its own.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"A shadow compass. It does not point north. It points toward what you need to find."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— The needle was pointing west. Toward the Deepreach.</p>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"How much?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"You cannot afford it. I am giving it to you."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Why?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"Because someone gave it to me when I needed it. And because what is coming from the Deepreach will arrive regardless of whether you are ready for it, and I would rather you have a tool than not."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Take care of it. It is not indestructible."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-bunbun">
+          <div class="dialogue-avatar">🏮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">BunBun</div>
+            <div class="dialogue-bubble">"Neither am I."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"No. But you are harder to break than you think."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER IV — Prolith first encounter -->
+    <section class="chapter" id="ch4">
+      <div class="chapter-header">
+        <div class="chapter-roman">IV</div>
+        <div class="chapter-label">Chapter Four</div>
+        <h2 class="chapter-title">Powers That Should Not Exist</h2>
+        <blockquote class="chapter-epigraph">
+          Shadow is not darkness. Darkness is the absence of light. Shadow is the proof that light exists — and that something stands between the light and what it would illuminate.
+          <cite>— From the Warlock Codex, authorship disputed</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>He practiced at night. The back garden. The stone bench. The apple tree. The shadow came easily when he did not fight it. The air was different — air came with a kind of joy that shadow did not have. When he let both out at once — shadow and air together, not fighting, just coexisting — something happened that was neither element separately. The air grew darker. And the shadow moved faster, carried by the wind, directional rather than ambient. <em>Storm-shadow,</em> he thought. <em>That is what it is.</em></p>
+        <p>He practiced until the moon was high and then sat on the bench and breathed. His hands were dark at the fingertips — a shadow-dark that faded slowly as he pulled the power back in.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Unknown Voice</div>
+            <div class="dialogue-bubble">"You look better when you let it out."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Nicholas was on his feet in an instant, turned, the shadow already rising in his hands before he had thought about reaching for it. Standing at the western edge of the garden was someone he had not heard approach — and had not felt approach, which was wrong on both counts. He felt everyone who came near him. This person had no empathic signal at all.</p>
+        <p>He was male. Pale as winter stone, with hair so black it had a slight crimson cast where the moonlight caught it. His eyes were grey with a spiral quality. He was wearing dark clothes that were somehow very elegant, and he was holding a wand with silver veining that moved slightly as Nicholas looked at it. And the air smelled of burning roses.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Who are you?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"Someone who has been watching you practice. You have real talent. The shadow-air combination is rare. Most warlocks do not discover it on their own."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I did not ask about my power. I asked who you are."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"My name is Prolith. I am not a threat to you."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"You have no empathic signal. Every person has one. You have none. That is not how people work."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"I am not precisely a person. I am something adjacent to it. A category that does not have a clean name in the current vocabulary."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"What do you want?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"Currently? To watch you practice. The warlock pact in your bloodline is unusual — most inherited pacts are dormant by the third generation. Yours is not only active, it is growing. I am curious about why."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I am going to go back inside."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"Of course. I will be here tomorrow if you have questions."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I will not have questions."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"You will. You have a great many questions. You have been keeping them inside because there is no one to ask. But the questions are there. I can hear them."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"The scent of burning roses. I will know when you are near."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-prolith">
+          <div class="dialogue-avatar">🌹</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Prolith</div>
+            <div class="dialogue-bubble">"I would expect nothing less."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER VIII — Companions Gathering -->
+    <section class="chapter" id="ch8">
+      <div class="chapter-header">
+        <div class="chapter-roman">VIII</div>
+        <div class="chapter-label">Chapter Eight</div>
+        <h2 class="chapter-title">Companions Gathering</h2>
+        <blockquote class="chapter-epigraph">
+          The right people do not appear because you need them. They appear because the world has been moving them toward you for a long time, and the moment arrives when the geometry is right.
+          <cite>— From the Lore of the Wandering Paths</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>They began arriving the week after the forcefield event. Nicholas did not send for them. They came because the word had moved — through the ranger networks, through the trade roads, through whatever communication system exists among people who know that certain events in certain places are beginning points rather than endings.</p>
+        <p>Valyren arrived first. He was taller than average, lean in the way that very good fighters were lean — functional, nothing wasted. Twin blades at his back. A length of living chain at his hip that rested there rather than being attached.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"I heard about the ward. About the fifth anchor going active."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Word travels."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"To people who are listening for it, yes."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— He sat down at the table without being invited. Confident rather than rude.</p>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"You are going to the Deepreach."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Eventually."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"I am going with you. Because the Earth Tower has been inactive for forty years, and I have been looking for something worth going toward for two years, and this is it. Also because shadow-air warlocks need someone at their left flank."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I do not know you."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"That is going to change."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Nicholas looked at Alexa. Alexa looked at Valyren with those deep grey eyes for a long moment and then walked over and sniffed the back of his hand. Then she returned to her spot by the window. Not disapproval. Not yet approval. Provisional.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"All right. For now."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"For now is enough."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>Adelaide and Dianne arrived the next day. Dianne carried a basket and smelled of bread and something warm. She looked at the room, looked at the people, looked at Alexa, and said:</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-dianne">
+          <div class="dialogue-avatar">🕯️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Dianne</div>
+            <div class="dialogue-bubble">"I am going to make tea. Does anyone object?"</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— Nobody objected.</p>
+        <div class="dialogue-line spk-adelaide">
+          <div class="dialogue-avatar">✨</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Adelaide</div>
+            <div class="dialogue-bubble">"We always travel together. That is not a requirement for others to accommodate."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Together is fine."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-dianne">
+          <div class="dialogue-avatar">🕯️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Dianne</div>
+            <div class="dialogue-bubble">"Good boy."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— Valyren made a sound that was very close to a laugh.</p>
+      </div>
+
+      <div class="prose">
+        <p>Rominae arrived on a Tuesday and let herself in through the back wall of the kitchen, which did not move or open but through which she stepped as if the wall were a curtain, arriving between one moment and the next. Nicholas had the shadow up before she finished stepping through.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-rominae">
+          <div class="dialogue-avatar">🔮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Rominae</div>
+            <div class="dialogue-bubble">"Dark magic witch. You have already been told about me. Or you will be soon. The timeline is a bit fluid from my perspective."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Who are you?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-rominae">
+          <div class="dialogue-avatar">🔮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Rominae</div>
+            <div class="dialogue-bubble">"Rominae. I am here for the expedition. Is there tea?"</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-dianne">
+          <div class="dialogue-avatar">🕯️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Dianne</div>
+            <div class="dialogue-bubble">"There is always tea."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— entirely unbothered</p>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Soul-sight. You said you can see what people fear most."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-rominae">
+          <div class="dialogue-avatar">🔮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Rominae</div>
+            <div class="dialogue-bubble">"I have made a choice not to look unless I need to. Some people find it less unsettling when they know someone could see something and is choosing not to."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"Thank you for telling me."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-rominae">
+          <div class="dialogue-avatar">🔮</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Rominae</div>
+            <div class="dialogue-bubble">"You are welcome."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER IX — Laura -->
+    <section class="chapter" id="ch9">
+      <div class="chapter-header">
+        <div class="chapter-roman">IX</div>
+        <div class="chapter-label">Chapter Nine</div>
+        <h2 class="chapter-title">Laura and the Sound of War</h2>
+        <blockquote class="chapter-epigraph">
+          Strategy is not what you do when things go wrong. Strategy is the structure that makes things go right — the architecture behind the chaos.
+          <cite>— From the Battle Compositions of Laura Veil</cite>
+        </blockquote>
+      </div>
+      <div class="prose">
+        <p>Laura arrived with an enormous case — genuinely enormous, a hard-sided case on wheels that she navigated through the front door with the ease of someone who had done it in much smaller spaces, tilting it at exactly the right angle to clear the doorframe without scratching it.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"Laura Veil. Sound Sovereign, Battle DJ, and your strategy officer. Do not argue with me about the last one. I have assessed the group and you need one and I am the most qualified."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"I was not going to argue."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"Good."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— She was already opening the case.</p>
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"The emitters are directional. This amplifies power tenfold. I have damaged structural stone at full volume. Do not test it inside."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-nicholas">
+          <div class="dialogue-avatar">🌑</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Nicholas</div>
+            <div class="dialogue-bubble">"We will not test it inside."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prose">
+        <p>That evening, with the full group gathered in the kitchen, Laura spread a map on the table.</p>
+      </div>
+
+      <div class="dialogue-block">
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"The Earth Tower is approximately seven miles in from the tree line. Based on fragmentary records and stated travel times of previous expeditions — most of which did not reach the tower — I estimate five to seven days of internal travel."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"Seven miles in the Deepreach is not seven miles on a road."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"Correct. The records consistently describe the Deepreach as aware. Not intelligent in the way a person is intelligent. But responsive. It reads the group and it responds. The challenges we face are likely to be specific to us. For formation: Valyren — left flank, front. Yulioh — rear defensive. Adelaide and Dianne — centre and protected. July — environmental awareness. Ksu — pre-battle preparation. Rominae — wild card, her own judgement. Nicholas and Alexa — centre front. Me — wherever the strategy requires."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-valyren">
+          <div class="dialogue-avatar">⛓️</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Valyren</div>
+            <div class="dialogue-bubble">"That was the best briefing I have attended."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"I know. I give the best briefings. Get some sleep. We leave in four days."</div>
+          </div>
+        </div>
+        <p class="narrator-aside">— Alexa, who had been sitting beside Laura's feet since Laura sat down, looked up at her with those grey-depth eyes.</p>
+        <div class="dialogue-line spk-ksu">
+          <div class="dialogue-avatar">🎨</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Ksu</div>
+            <div class="dialogue-bubble">"She likes you."</div>
+          </div>
+        </div>
+        <div class="dialogue-line spk-laura">
+          <div class="dialogue-avatar">🎵</div>
+          <div class="dialogue-content">
+            <div class="dialogue-speaker">Laura</div>
+            <div class="dialogue-bubble">"I know. Animals with good judgment always do."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Continue reading prompt -->
+    <div style="max-width: 680px; text-align: center; padding: 3rem 0 1rem; border-top: 1px solid rgba(184,169,232,0.1);">
+      <p style="font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem;">The story continues through 19 chapters and an epilogue</p>
+      <p style="font-style: italic; color: rgba(184,169,232,0.5); font-size: 0.95rem; margin-bottom: 2rem;">Nicholas and the company cross into the Deepreach. They face the Fear Trial, the Earth Tower, and discover what the warlock pact was sealed against — and why the Void has been watching this specific boy for his entire life.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="volumes.html" style="font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; padding: 0.9rem 2rem; background: linear-gradient(135deg, var(--shadow-purple), var(--rose-dark)); color: var(--moon); border: 1px solid rgba(184,169,232,0.2);">All Volumes</a>
+        <a href="vol2.html" style="font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; padding: 0.9rem 2rem; background: transparent; color: var(--starlight); border: 1px solid rgba(184,169,232,0.2);">Volume II →</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <h2 class="footer-title">Nicholas Shadowrider</h2>
+  <svg class="ornament" width="200" height="20" viewBox="0 0 200 20">
+    <line x1="0" y1="10" x2="80" y2="10" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+    <polygon points="90,2 100,10 90,18 80,10" stroke="#c9a84c" fill="none" stroke-width="0.5" opacity="0.4"/>
+    <circle cx="100" cy="10" r="2" fill="#c9a84c" opacity="0.6"/>
+    <polygon points="110,2 120,10 110,18 120,10" stroke="#c9a84c" fill="none" stroke-width="0.5" opacity="0.4"/>
+    <line x1="120" y1="10" x2="200" y2="10" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+  </svg>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="volumes.html">All Volumes</a></li>
+    <li><a href="characters.html">Characters</a></li>
+    <li><a href="world.html">The World</a></li>
+  </ul>
+  <p class="footer-copy">Where shadow breathes and storm winds cry · Age Rating 15+</p>
+</footer>
+
+<script>
+// Stars
+const canvas = document.getElementById('stars-canvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 120; i++) stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1 + 0.2, o: Math.random() * 0.4 + 0.1, t: Math.random() * Math.PI * 2, s: Math.random() * 0.02 + 0.005 });
+}
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.t += s.s;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(184,169,232,${s.o * (0.5 + 0.5 * Math.sin(s.t))})`; ctx.fill();
+  });
+  requestAnimationFrame(draw);
+}
+resize(); initStars(); draw();
+window.addEventListener('resize', () => { resize(); initStars(); });
+
+// Reading progress bar
+const bar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (window.scrollY / h * 100) + '%';
+});
+
+// TOC active state
+const chapters = document.querySelectorAll('.chapter, .foreword-section');
+const tocLinks = document.querySelectorAll('.toc-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+chapters.forEach(c => observer.observe(c));
+</script>
+</body>
+</html>
