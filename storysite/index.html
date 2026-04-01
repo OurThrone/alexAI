@@ -3,39 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Story Hub</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="scripts.js" defer></script>
+    <title>Story Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .character {
+            font-weight: bold;
+            color: #f39c12;
+        }
+        .dialogue {
+            margin: 10px 0;
+        }
+        .chapter-header {
+            font-size: 24px;
+            margin-top: 40px;
+            border-bottom: 2px solid #34495e;
+            padding-bottom: 10px;
+        }
+        .world-image, .character-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Interactive Story Hub</h1>
-        <nav>
-            <ul>
-                <li><a href="#volume1">Volume 1</a></li>
-                <li><a href="#volume2">Volume 2</a></li>
-                <li><a href="#volume3">Volume 3</a></li>
-                <li><a href="#volume4">Volume 4</a></li>
-                <li><a href="#volume5">Volume 5</a></li>
-                <li><a href="#volume6">Volume 6</a></li>
-                <li><a href="#volume7">Volume 7</a></li>
-                <li><a href="#volume8">Volume 8</a></li>
-                <li><a href="#volume9">Volume 9</a></li>
-                <li><a href="#volume10">Volume 10</a></li>
-                <li><a href="#volume11">Volume 11</a></li>
-                <li><a href="#volume12">Volume 12</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="volume1">
-            <h2>Volume 1</h2>
-            <p>Full chapters with enhanced dialogues...</p>
-        </section>
-        <!-- Repeat for each volume -->
-    </main>
-    <footer>
-        <p>Copyright © 2026 OurThrone</p>
-    </footer>
+    <div class="chapter-header">Chapter 1: The Beginning</div>
+    <div class="dialogue">
+        <span class="character">Character A:</span> Welcome to our story! This is where our journey begins.
+    </div>
+    <img class="world-image" src="path/to/world-placeholder.jpg" alt="World Placeholder">
+    <div class="dialogue">
+        <span class="character">Character B:</span> It's a beautiful world, isn't it?
+    </div>
+    <img class="character-image" src="path/to/character-placeholder.jpg" alt="Character Placeholder">
+    <div class="dialogue">
+        <span class="character">Character A:</span> Yes, I can't wait to explore it more.
+    </div>
+    <div class="chapter-header">Chapter 2: The Adventure Continues</div>
+    <div class="dialogue">
+        <span class="character">Character B:</span> What should we do next?
+    </div>
+    <div class="dialogue">
+        <span class="character">Character A:</span> Let's find the hidden treasures!
+    </div>
 </body>
 </html>
